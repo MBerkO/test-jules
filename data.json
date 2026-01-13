@@ -1,0 +1,14 @@
+{
+    "siteTitle": "Kişisel Kartvizit",
+    "favicon": "https://via.placeholder.com/32",
+    "profileImage": "https://via.placeholder.com/150",
+    "name": "Ad Soyad",
+    "title": "Yazılım Geliştirici",
+    "bio": "Merhaba! Ben minimalist tasarımlar ve temiz kod yazmayı seven tutkulu bir geliştiriciyim. Web teknolojileri ve kullanıcı deneyimi üzerine çalışıyorum.",
+    "socials": [
+        { "network": "github", "url": "#", "enabled": true, "icon": "fab fa-github" },
+        { "network": "linkedin", "url": "#", "enabled": true, "icon": "fab fa-linkedin" },
+        { "network": "twitter", "url": "#", "enabled": true, "icon": "fab fa-twitter" },
+        { "network": "email", "url": "mailto:email@example.com", "enabled": true, "icon": "fas fa-envelope" }
+    ]
+}

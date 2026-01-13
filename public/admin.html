@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yönetim Paneli</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+    <div class="admin-container">
+        <h1>Site Ayarları</h1>
+        <form id="admin-form">
+            <div class="form-group">
+                <label for="siteTitle">Site Başlığı (Tarayıcı Sekmesi)</label>
+                <input type="text" id="siteTitle" name="siteTitle">
+            </div>
+
+            <div class="form-group">
+                <label for="favicon">Favicon URL</label>
+                <input type="text" id="favicon" name="favicon">
+            </div>
+
+            <div class="form-group">
+                <label for="profileImage">Profil Fotoğrafı URL</label>
+                <input type="text" id="profileImage" name="profileImage">
+            </div>
+
+            <div class="form-group">
+                <label for="name">Ad Soyad</label>
+                <input type="text" id="name" name="name">
+            </div>
+
+            <div class="form-group">
+                <label for="title">Unvan</label>
+                <input type="text" id="title" name="title">
+            </div>
+
+            <div class="form-group">
+                <label for="bio">Biyografi</label>
+                <textarea id="bio" name="bio" rows="4"></textarea>
+            </div>
+
+            <h2>Sosyal Medya</h2>
+            <div id="socials-container">
+                <!-- Social fields injected here -->
+            </div>
+
+            <button type="submit" class="save-btn">Kaydet</button>
+            <p id="message"></p>
+        </form>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>
