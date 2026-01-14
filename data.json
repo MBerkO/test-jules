@@ -1,0 +1,12 @@
+{
+  "name": "Ad Soyad",
+  "title": "Yazılım Geliştirici",
+  "bio": "Merhaba! Ben minimalist tasarımlar ve temiz kod yazmayı seven tutkulu bir geliştiriciyim. Web teknolojileri ve kullanıcı deneyimi üzerine çalışıyorum.",
+  "socialLinks": {
+    "github": "#",
+    "linkedin": "#",
+    "twitter": "#",
+    "email": "mailto:email@example.com"
+  },
+  "theme": "light"
+}

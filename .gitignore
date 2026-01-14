@@ -1,0 +1,6 @@
+node_modules/
+server.log
+curl_output.txt
+get_output.txt
+post_output.txt
+verification/
