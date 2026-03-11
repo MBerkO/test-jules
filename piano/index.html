@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimalist Piyano</title>
+    <style>
+        :root {
+            --bg-color: #f9f9f9;
+            --text-color: #333;
+            --panel-bg: #fff;
+            --panel-border: #eee;
+            --white-key-bg: #fff;
+            --white-key-border: #ccc;
+            --white-key-active: #e0e0e0;
+            --black-key-bg: #333;
+            --black-key-active: #555;
+            --label-color: #999;
+            --btn-bg: #f0f0f0;
+            --btn-hover: #e0e0e0;
+            --btn-text: #333;
+        }
+
+        :root[data-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --text-color: #f0f0f0;
+            --panel-bg: #2a2a2a;
+            --panel-border: #444;
+            --white-key-bg: #f5f5f5;
+            --white-key-border: #444;
+            --white-key-active: #ddd;
+            --black-key-bg: #222;
+            --black-key-active: #444;
+            --label-color: #666;
+            --btn-bg: #444;
+            --btn-hover: #555;
+            --btn-text: #f0f0f0;
+        }
+
+        /* Fix for buttons/selects in dark mode explicitly */
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            transition: background-color 0.3s, color 0.3s;
+            user-select: none;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            padding: 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            background-color: var(--panel-bg);
+            padding: 15px 25px;
+            border-radius: 12px;
+            border: 1px solid var(--panel-border);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        select, button {
+            background-color: var(--btn-bg);
+            color: var(--btn-text);
+            border: 1px solid var(--panel-border);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            outline: none;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        select:hover, button:hover {
+            background-color: var(--btn-hover);
+        }
+
+        label {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .piano {
+            display: flex;
+            position: relative;
+            padding: 10px;
+            background-color: var(--panel-bg);
+            border-radius: 8px;
+            border: 1px solid var(--panel-border);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            overflow-x: auto;
+            max-width: 100%;
+        }
+
+        .key {
+            position: relative;
+            cursor: pointer;
+            border-radius: 0 0 5px 5px;
+            transition: background-color 0.1s;
+        }
+
+        .key.white {
+            width: 50px;
+            height: 200px;
+            background-color: var(--white-key-bg);
+            border: 1px solid var(--white-key-border);
+            z-index: 1;
+        }
+
+        .key.white.active {
+            background-color: var(--white-key-active);
+            height: 198px;
+            transform: translateY(2px);
+        }
+
+        .key.black {
+            width: 34px;
+            height: 120px;
+            background-color: var(--black-key-bg);
+            z-index: 2;
+            margin-left: -17px;
+            margin-right: -17px;
+            border-radius: 0 0 4px 4px;
+        }
+
+        .key.black.active {
+            background-color: var(--black-key-active);
+            height: 118px;
+            transform: translateY(2px);
+        }
+
+        .label {
+            position: absolute;
+            bottom: 15px;
+            width: 100%;
+            text-align: center;
+            font-size: 12px;
+            color: var(--label-color);
+            pointer-events: none;
+            display: none;
+        }
+
+        .show-labels .label {
+            display: block;
+        }
+
+        .key.black .label {
+            color: #fff;
+            bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .key.white { width: 40px; height: 160px; }
+            .key.black { width: 28px; height: 100px; margin-left: -14px; margin-right: -14px; }
+            .controls { flex-direction: column; align-items: stretch; }
+            .control-group { justify-content: space-between; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="controls">
+            <div class="control-group">
+                <label for="typeSelect">Tarz:</label>
+                <select id="typeSelect">
+                    <option value="sine">Klasik (Sine)</option>
+                    <option value="triangle">Yumuşak (Triangle)</option>
+                    <option value="square">Elektronik (Square)</option>
+                    <option value="sawtooth">Keskin (Sawtooth)</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="octaveSelect">Oktav Sayısı:</label>
+                <select id="octaveSelect">
+                    <option value="1">1 Oktav</option>
+                    <option value="2" selected>2 Oktav</option>
+                    <option value="3">3 Oktav</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <button id="toggleLabelsBtn">Etiketleri Göster/Gizle</button>
+            </div>
+
+            <div class="control-group">
+                <button id="toggleThemeBtn">Karanlık/Aydınlık Mod</button>
+            </div>
+        </div>
+
+        <div class="piano" id="pianoContainer">
+            <!-- Piano keys will be generated here -->
+        </div>
+    </div>
+
+    <script>
+        // Audio Context setup
+        let audioCtx;
+
+        // Define notes and frequencies starting from C4
+        const NOTE_FREQUENCIES = {
+            'C': 261.63, 'C#': 277.18, 'D': 293.66, 'D#': 311.13, 'E': 329.63, 'F': 349.23,
+            'F#': 369.99, 'G': 392.00, 'G#': 415.30, 'A': 440.00, 'A#': 466.16, 'B': 493.88
+        };
+
+        const NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+
+        // Keyboard mapping for 2 octaves
+        const KEY_MAP_1 = ['A', 'W', 'S', 'E', 'D', 'F', 'T', 'G', 'Y', 'H', 'U', 'J'];
+        const KEY_MAP_2 = ['K', 'O', 'L', 'P', ';', "'", ']', '\\']; // Example extended mapping
+
+        const ALL_KEYS = [
+            'A', 'W', 'S', 'E', 'D', 'F', 'T', 'G', 'Y', 'H', 'U', 'J', // Octave 1
+            'K', 'O', 'L', 'P', ';', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', // Octave 2
+            ',', '.', '/' // Partial Octave 3
+        ];
+
+        let activeOscillators = {};
+        let activeKeys = new Set();
+        let currentType = 'sine';
+        let numOctaves = 2;
+        let showLabels = false;
+
+        const pianoContainer = document.getElementById('pianoContainer');
+        const typeSelect = document.getElementById('typeSelect');
+        const octaveSelect = document.getElementById('octaveSelect');
+        const toggleLabelsBtn = document.getElementById('toggleLabelsBtn');
+        const toggleThemeBtn = document.getElementById('toggleThemeBtn');
+
+        // Initialize theme based on system preference
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+
+        toggleThemeBtn.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            if (currentTheme === 'dark') {
+                document.documentElement.removeAttribute('data-theme');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        });
+
+        typeSelect.addEventListener('change', (e) => {
+            currentType = e.target.value;
+        });
+
+        octaveSelect.addEventListener('change', (e) => {
+            numOctaves = parseInt(e.target.value);
+            renderPiano();
+        });
+
+        toggleLabelsBtn.addEventListener('click', () => {
+            showLabels = !showLabels;
+            if (showLabels) {
+                pianoContainer.classList.add('show-labels');
+            } else {
+                pianoContainer.classList.remove('show-labels');
+            }
+        });
+
+        function getFrequency(noteIndex, octaveIndex) {
+            const baseFreq = NOTE_FREQUENCIES[NOTES[noteIndex]];
+            return baseFreq * Math.pow(2, octaveIndex);
+        }
+
+        function playNote(freq, keyElement, noteId) {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+
+            if (activeOscillators[noteId]) return; // Already playing
+
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+
+            oscillator.type = currentType;
+            oscillator.frequency.value = freq;
+
+            // Envelope to avoid clicking sounds
+            gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.5, audioCtx.currentTime + 0.05);
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            oscillator.start();
+            activeOscillators[noteId] = { osc: oscillator, gain: gainNode };
+
+            keyElement.classList.add('active');
+        }
+
+        function stopNote(noteId, keyElement) {
+            if (activeOscillators[noteId]) {
+                const { osc, gain } = activeOscillators[noteId];
+
+                // Fade out
+                gain.gain.setValueAtTime(gain.gain.value, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+
+                osc.stop(audioCtx.currentTime + 0.1);
+                delete activeOscillators[noteId];
+            }
+
+            if (keyElement) {
+                keyElement.classList.remove('active');
+            }
+        }
+
+        function handlePointerDown(e) {
+            if (!e.target.classList.contains('key')) return;
+            e.preventDefault(); // Prevent text selection/drag
+
+            const freq = parseFloat(e.target.dataset.freq);
+            const noteId = e.target.dataset.noteId;
+            playNote(freq, e.target, noteId);
+
+            // Handle pointer dragging
+            e.target.setPointerCapture(e.pointerId);
+        }
+
+        function handlePointerUp(e) {
+            if (!e.target.classList.contains('key')) return;
+            e.preventDefault();
+
+            const noteId = e.target.dataset.noteId;
+            stopNote(noteId, e.target);
+            e.target.releasePointerCapture(e.pointerId);
+        }
+
+        function handlePointerLeave(e) {
+            if (!e.target.classList.contains('key')) return;
+            const noteId = e.target.dataset.noteId;
+            if (activeOscillators[noteId]) {
+                stopNote(noteId, e.target);
+            }
+        }
+
+        function renderPiano() {
+            pianoContainer.innerHTML = '';
+            let keyIndex = 0;
+
+            for (let octave = 0; octave < numOctaves; octave++) {
+                for (let i = 0; i < NOTES.length; i++) {
+                    const noteName = NOTES[i];
+                    const isBlack = noteName.includes('#');
+                    const freq = getFrequency(i, octave);
+                    const noteId = `${noteName}${octave+4}`;
+                    const keyboardKey = ALL_KEYS[keyIndex] || '';
+
+                    const keyDiv = document.createElement('div');
+                    keyDiv.className = `key ${isBlack ? 'black' : 'white'}`;
+                    keyDiv.dataset.freq = freq;
+                    keyDiv.dataset.noteId = noteId;
+                    keyDiv.dataset.keyBind = keyboardKey.toLowerCase();
+
+                    if (keyboardKey) {
+                        const labelDiv = document.createElement('div');
+                        labelDiv.className = 'label';
+                        labelDiv.textContent = keyboardKey;
+                        keyDiv.appendChild(labelDiv);
+                    }
+
+                    // Touch / Mouse Events
+                    keyDiv.addEventListener('pointerdown', handlePointerDown);
+                    keyDiv.addEventListener('pointerup', handlePointerUp);
+                    keyDiv.addEventListener('pointerleave', handlePointerLeave);
+                    keyDiv.addEventListener('pointercancel', handlePointerUp);
+
+                    pianoContainer.appendChild(keyDiv);
+                    keyIndex++;
+                }
+            }
+        }
+
+        // Keyboard Events
+        window.addEventListener('keydown', (e) => {
+            if (e.repeat) return;
+            const key = e.key.toLowerCase();
+            const keyElement = document.querySelector(`.key[data-key-bind="${key}"]`);
+
+            if (keyElement) {
+                const freq = parseFloat(keyElement.dataset.freq);
+                const noteId = keyElement.dataset.noteId;
+                playNote(freq, keyElement, noteId);
+            }
+        });
+
+        window.addEventListener('keyup', (e) => {
+            const key = e.key.toLowerCase();
+            const keyElement = document.querySelector(`.key[data-key-bind="${key}"]`);
+
+            if (keyElement) {
+                const noteId = keyElement.dataset.noteId;
+                stopNote(noteId, keyElement);
+            }
+        });
+
+        // Initialize
+        renderPiano();
+    </script>
+</body>
+</html>
