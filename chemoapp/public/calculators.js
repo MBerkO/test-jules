@@ -104,10 +104,3 @@ function processChemotherapyDoses(chemotherapy, bsa) {
     return drug;
   });
 }
-
-module.exports = {
-  calculateBSA,
-  calculateCrCl,
-  calculateCarboplatinDose,
-  processChemotherapyDoses
-};

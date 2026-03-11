@@ -1,5 +1,5 @@
-const API_BASE = '/api';
 let currentCalculation = null;
+let currentProtocols = [];
 
 // DOM Elements
 const themeBtn = document.getElementById('themeBtn');
@@ -30,27 +30,29 @@ function toggleTheme() {
 
 themeBtn.addEventListener('click', toggleTheme);
 
-// Load Protocols
+// Load Protocols (from window.DEFAULT_PROTOCOLS + localStorage)
 async function loadProtocols() {
-  try {
-    const res = await fetch(`${API_BASE}/protocols`);
-    const data = await res.json();
-    if (data.success) {
-      protocolSelect.innerHTML = '<option value="">-- Lütfen Seçiniz --</option>';
-      data.protocols.forEach(p => {
-        const opt = document.createElement('option');
-        opt.value = p.id;
-        opt.textContent = p.name;
-        protocolSelect.appendChild(opt);
-      });
-    }
-  } catch (err) {
-    console.error('Failed to load protocols', err);
-    protocolSelect.innerHTML = '<option value="">Hata: Protokoller yüklenemedi</option>';
+  currentProtocols = [...window.DEFAULT_PROTOCOLS];
+
+  // Also load any custom protocols from localStorage
+  const savedCustoms = localStorage.getItem('chemoapp_custom_protocols');
+  if (savedCustoms) {
+      try {
+          const customs = JSON.parse(savedCustoms);
+          currentProtocols = currentProtocols.concat(customs);
+      } catch(e) { console.error("Could not load custom protocols", e); }
   }
+
+  protocolSelect.innerHTML = '<option value="">-- Lütfen Seçiniz --</option>';
+  currentProtocols.forEach(p => {
+    const opt = document.createElement('option');
+    opt.value = p.id;
+    opt.textContent = p.name;
+    protocolSelect.appendChild(opt);
+  });
 }
 
-// Initialize (Load Protocols and check system theme)
+// Initialize
 window.onload = async () => {
   // Check system preference for dark mode
   if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
@@ -123,6 +125,12 @@ createProtocolForm.addEventListener('submit', async (e) => {
   const id = document.getElementById('newProtocolId').value.trim();
   const name = document.getElementById('newProtocolName').value.trim();
 
+  // Check duplicate
+  if (currentProtocols.some(p => p.id === id)) {
+      alert("Bu ID ile bir protokol zaten var. Lütfen farklı bir ID seçin.");
+      return;
+  }
+
   const phases = {
     home_pre_meds: [],
     pre_meds: [],
@@ -157,28 +165,23 @@ createProtocolForm.addEventListener('submit', async (e) => {
   const newProtocol = { id, name, phases };
 
   try {
-    const res = await fetch(`${API_BASE}/protocols`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newProtocol)
-    });
-    const data = await res.json();
+    let savedCustoms = [];
+    const lsCustoms = localStorage.getItem('chemoapp_custom_protocols');
+    if (lsCustoms) savedCustoms = JSON.parse(lsCustoms);
+    savedCustoms.push(newProtocol);
+    localStorage.setItem('chemoapp_custom_protocols', JSON.stringify(savedCustoms));
 
-    if (data.success) {
-      alert('Protokol başarıyla eklendi!');
-      closeModal();
-      await loadProtocols(); // Reload dropdown
-      protocolSelect.value = id; // Auto-select new protocol
-    } else {
-      alert('Hata: ' + data.message);
-    }
+    alert('Protokol başarıyla eklendi!');
+    closeModal();
+    await loadProtocols(); // Reload dropdown
+    protocolSelect.value = id; // Auto-select new protocol
   } catch (err) {
     console.error(err);
-    alert('Sunucu hatası. Protokol kaydedilemedi.');
+    alert('Tarayıcı depolama (localStorage) hatası. Protokol kaydedilemedi.');
   }
 });
 
-// Form Submission -> API Calculation
+// Form Submission -> Static Calculation
 patientForm.addEventListener('submit', async (e) => {
   e.preventDefault();
 
@@ -191,27 +194,55 @@ patientForm.addEventListener('submit', async (e) => {
     creatinine: Number(document.getElementById('creatinine').value)
   };
   const protocolId = protocolSelect.value;
+  const protocol = currentProtocols.find(p => p.id === protocolId);
 
-  try {
-    const res = await fetch(`${API_BASE}/calculate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ protocolId, patient })
-    });
-    const data = await res.json();
-
-    if (data.success) {
-      currentCalculation = { patient, ...data.calculation };
-      renderStep2(currentCalculation);
-      step1.classList.remove('active');
-      step2.classList.add('active');
-    } else {
-      alert('Hesaplama Hatası: ' + data.message);
-    }
-  } catch (err) {
-    console.error(err);
-    alert('Sunucuya bağlanılamadı.');
+  if (!protocol) {
+      alert("Protokol bulunamadı.");
+      return;
   }
+
+  // Use global calculation functions (from calculators.js)
+  const bsaResult = calculateBSA(patient.weight, patient.height);
+  const crcl = calculateCrCl(patient.age, patient.weight, patient.creatinine, patient.gender);
+
+  const clonedProtocol = JSON.parse(JSON.stringify(protocol));
+  const newPhases = {};
+  const phaseKeys = ['home_pre_meds', 'pre_meds', 'chemotherapy', 'post_meds', 'home_post_meds'];
+
+  phaseKeys.forEach(phase => {
+      newPhases[phase] = processChemotherapyDoses(clonedProtocol.phases[phase], bsaResult.average);
+  });
+
+  let processedChemotherapy = newPhases.chemotherapy || [];
+
+  // Carboplatin Calvert override
+  processedChemotherapy = processedChemotherapy.map(drug => {
+     if (drug.target_auc) {
+       const dose = calculateCarboplatinDose(drug.target_auc, crcl);
+       return { ...drug, calculated_dose: dose, original_calculated_dose: dose };
+     }
+     return drug;
+  });
+  newPhases.chemotherapy = processedChemotherapy;
+
+  // Use global safety function (from safety.js)
+  const safetyCheck = checkCumulativeAnthracycline(patient.name, processedChemotherapy, bsaResult.average);
+
+  const calculationResult = {
+    patient,
+    bsa: bsaResult,
+    crcl,
+    protocol: {
+      ...clonedProtocol,
+      phases: newPhases
+    },
+    safety_warnings: safetyCheck.isExceeded ? [safetyCheck.warningMessage] : []
+  };
+
+  currentCalculation = calculationResult;
+  renderStep2(currentCalculation);
+  step1.classList.remove('active');
+  step2.classList.add('active');
 });
 
 backBtn.addEventListener('click', () => {
@@ -225,20 +256,17 @@ printBtn.addEventListener('click', () => {
 
 // Render the calculated data in Step 2
 function renderStep2(data) {
-  // Update Patient Info Card
   document.getElementById('resHeight').textContent = data.patient.height;
   document.getElementById('resWeight').textContent = data.patient.weight;
   document.getElementById('resBsa').textContent = data.bsa.average;
   document.getElementById('resCrcl').textContent = data.crcl;
 
-  // Update Print Header
   document.getElementById('printPatientInfo').innerHTML = `
     <strong>Hasta:</strong> ${data.patient.name} | <strong>Yaş/Cinsiyet:</strong> ${data.patient.age} / ${data.patient.gender === 'male' ? 'E' : 'K'} <br>
     <strong>Protokol:</strong> ${data.protocol.name} <br>
     <strong>Tarih:</strong> ${new Date().toLocaleDateString('tr-TR')}
   `;
 
-  // Safety Warnings
   if (data.safety_warnings && data.safety_warnings.length > 0) {
     safetyWarning.textContent = data.safety_warnings.join(' | ');
     safetyWarning.classList.remove('hidden');
@@ -246,9 +274,8 @@ function renderStep2(data) {
     safetyWarning.classList.add('hidden');
   }
 
-  // Render Phases
   const container = document.getElementById('protocolPhasesContainer');
-  container.innerHTML = ''; // Clear previous
+  container.innerHTML = '';
 
   const phaseNames = {
     'home_pre_meds': 'Evde Başlanacak Pre-medikasyon',
@@ -283,7 +310,6 @@ function renderStep2(data) {
 
       const limitBadge = drug.limit_applied ? ` <span style="color:red; font-size:12px;">(Max Limit: ${drug.max_dose} mg)</span>` : '';
 
-      // Create interactive inputs for FULL manual editing
       row.innerHTML = `
         <input type="text" class="drug-name" data-phase="${phaseKey}" data-index="${index}" data-field="drug" value="${drug.drug}">
         <input type="text" class="drug-dose" data-phase="${phaseKey}" data-index="${index}" data-field="dose" value="${doseVal}">
@@ -298,13 +324,11 @@ function renderStep2(data) {
     container.appendChild(section);
   }
 
-  // Clear previous justification
   document.getElementById('justification').value = '';
 }
 
-// Approval and Saving
+// Approval and Saving (to LocalStorage instead of Backend API)
 approveBtn.addEventListener('click', async () => {
-  // Collect modified data from DOM to see if doses were changed
   let hasManualChanges = false;
   const modifiedProtocol = JSON.parse(JSON.stringify(currentCalculation.protocol));
 
@@ -342,34 +366,54 @@ approveBtn.addEventListener('click', async () => {
     return;
   }
 
+  const orderId = `order-${Date.now()}`;
   const finalOrderData = {
+    id: orderId,
+    timestamp: new Date().toISOString(),
     patient: currentCalculation.patient,
     bsa: currentCalculation.bsa,
     crcl: currentCalculation.crcl,
-    protocol: modifiedProtocol
+    protocol: modifiedProtocol,
+    justification: hasManualChanges ? justificationText : "Manuel değişiklik yok"
   };
 
   try {
-    const res = await fetch(`${API_BASE}/order`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        order: finalOrderData,
-        justification: hasManualChanges ? justificationText : "Manuel değişiklik yok",
-        physician: "Demo Hekim (Dr. AI)"
-      })
-    });
-    const data = await res.json();
+    // Save Order to LocalStorage
+    let orders = [];
+    const lsOrders = localStorage.getItem('chemoapp_orders');
+    if (lsOrders) orders = JSON.parse(lsOrders);
+    orders.push(finalOrderData);
+    localStorage.setItem('chemoapp_orders', JSON.stringify(orders));
 
-    if (data.success) {
-      alert(`Order başarıyla kaydedildi! (Sistem No: ${data.orderId})`);
-      // Optionally reset form
-      // location.reload();
-    } else {
-      alert('Kayıt Hatası: ' + data.message);
+    // Update Patient Anthracycline history in LocalStorage if applicable
+    const anthracyclineDrug = modifiedProtocol.phases.chemotherapy.find(d => d.is_anthracycline);
+    if (anthracyclineDrug) {
+        let patients = {};
+        const lsPatients = localStorage.getItem('chemoapp_patients');
+        if (lsPatients) patients = JSON.parse(lsPatients);
+
+        const patientId = currentCalculation.patient.name.toLowerCase().replace(/\s+/g, '-');
+        if (!patients[patientId]) {
+            patients[patientId] = { cumulative_anthracycline_mg: 0 };
+        }
+        // Safely parse the applied dose (could have been manually edited to a string or number)
+        const doseApplied = parseFloat(anthracyclineDrug.calculated_dose) || 0;
+        patients[patientId].cumulative_anthracycline_mg += doseApplied;
+
+        localStorage.setItem('chemoapp_patients', JSON.stringify(patients));
     }
+
+    // Append to simple Audit Log Array in LocalStorage
+    let logs = [];
+    const lsLogs = localStorage.getItem('chemoapp_audit_logs');
+    if (lsLogs) logs = JSON.parse(lsLogs);
+    logs.push(`[${new Date().toISOString()}] OrderID: ${orderId} | Physician: Demo Hekim | Justification: ${finalOrderData.justification} | Protocol: ${modifiedProtocol.name}`);
+    localStorage.setItem('chemoapp_audit_logs', JSON.stringify(logs));
+
+    alert(`Order başarıyla kaydedildi! (Sistem No: ${orderId})`);
+
   } catch (err) {
     console.error(err);
-    alert('Sunucuya bağlanılamadı.');
+    alert('Tarayıcı depolama hatası. Order kaydedilemedi.');
   }
 });
