@@ -1,0 +1,22 @@
+{
+  "id": "act",
+  "name": "AC-T (Doxorubicin + Cyclophosphamide -> Paclitaxel)",
+  "phases": {
+    "home_pre_meds": [],
+    "pre_meds": [
+      { "drug": "Ondansetron", "dose": 8, "unit": "mg", "route": "IV", "duration": "15 min" },
+      { "drug": "Dexamethasone", "dose": 12, "unit": "mg", "route": "IV", "duration": "15 min" },
+      { "drug": "Aprepitant", "dose": 125, "unit": "mg", "route": "PO", "duration": "Uygulamadan 1 saat önce" }
+    ],
+    "chemotherapy": [
+      { "drug": "Doxorubicin", "dose_per_bsa": 60, "unit": "mg/m²", "route": "IV Bolus", "duration": "10-15 min", "is_anthracycline": true },
+      { "drug": "Cyclophosphamide", "dose_per_bsa": 600, "unit": "mg/m²", "route": "IV Infüzyon", "duration": "30-60 min" }
+    ],
+    "post_meds": [],
+    "home_post_meds": [
+      { "drug": "Aprepitant", "dose": "80mg", "frequency": "1x1", "duration": "2. ve 3. gün" },
+      { "drug": "Dexamethasone", "dose": "8mg", "frequency": "1x1", "duration": "2. ve 3. gün" },
+      { "drug": "Filgrastim (G-CSF)", "dose": "30 MU (300 mcg)", "route": "SC", "frequency": "1x1", "duration": "24 saat sonra, 5-7 gün" }
+    ]
+  }
+}
