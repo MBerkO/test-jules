@@ -1,0 +1,384 @@
+:root {
+  --bg-color: #f8f9fa;
+  --text-color: #212529;
+  --card-bg: #ffffff;
+  --border-color: #dee2e6;
+  --primary-color: #0d6efd;
+  --secondary-color: #6c757d;
+  --success-color: #198754;
+  --error-color: #dc3545;
+  --info-color: #0dcaf0;
+}
+
+[data-theme="dark"] {
+  --bg-color: #121212;
+  --text-color: #e0e0e0;
+  --card-bg: #1e1e1e;
+  --border-color: #333333;
+  --primary-color: #3f8cfb;
+  --secondary-color: #889096;
+  --success-color: #2fb36e;
+  --error-color: #e85d6b;
+  --info-color: #22defb;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  margin: 0;
+  padding: 20px;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.theme-toggle {
+  text-align: right;
+  margin-bottom: 20px;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  background-color: var(--card-bg);
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+header {
+  text-align: center;
+  border-bottom: 2px solid var(--border-color);
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+.wizard-step {
+  display: none;
+}
+.wizard-step.active {
+  display: block;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+.form-row {
+  display: flex;
+  gap: 15px;
+}
+.form-row .form-group {
+  flex: 1;
+}
+
+label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+input, select, textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  box-sizing: border-box;
+}
+
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  color: #fff;
+}
+.primary { background-color: var(--primary-color); }
+.secondary { background-color: var(--secondary-color); }
+.success { background-color: var(--success-color); }
+.error { background-color: var(--error-color); }
+.info { background-color: var(--info-color); }
+
+.info-card {
+  background-color: var(--bg-color);
+  border: 1px solid var(--border-color);
+  padding: 15px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+.phase-section {
+  margin-bottom: 20px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.phase-header {
+  background-color: var(--bg-color);
+  padding: 10px;
+  font-weight: bold;
+  border-bottom: 1px solid var(--border-color);
+}
+.phase-content {
+  padding: 10px;
+}
+
+.drug-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px dashed var(--border-color);
+}
+.drug-row:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+.drug-name { flex: 2; font-weight: bold; }
+.drug-dose { flex: 1; }
+.drug-unit { flex: 0.5; }
+.drug-route { flex: 1.5; }
+.drug-time { flex: 2; }
+
+.alert {
+  padding: 15px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  font-weight: bold;
+}
+.hidden { display: none; }
+
+.action-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 2px solid var(--border-color);
+}
+
+.audit-section {
+  margin-top: 20px;
+}
+
+.show-on-print { display: none; }
+
+/* Print Styles */
+@media print {
+  body {
+    background-color: #fff;
+    color: #000;
+  }
+  .container {
+    box-shadow: none;
+    border: none;
+    padding: 0;
+  }
+  .hide-on-print {
+    display: none !important;
+  }
+  .show-on-print {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 50px;
+  }
+  .hide-on-screen {
+    display: block !important;
+  }
+  .print-header {
+    text-align: center;
+    border-bottom: 2px solid #000;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+  }
+  input, select, textarea {
+    border: none;
+    background: transparent;
+    appearance: none;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    padding: 0;
+    font-weight: bold;
+  }
+  .phase-section {
+    border: 1px solid #000;
+  }
+  .phase-header {
+    background-color: #f0f0f0;
+    border-bottom: 1px solid #000;
+  }
+  .drug-row {
+    border-bottom: 1px dashed #ccc;
+  }
+  .sig-box {
+    border-top: 1px solid #000;
+    width: 200px;
+    text-align: center;
+    padding-top: 5px;
+  }
+}
+
+/* Additional Print Refinements for Nurse-Ready Order */
+@media print {
+  /* Set standard A4 page size */
+  @page {
+    size: A4 portrait;
+    margin: 15mm;
+  }
+
+  body {
+    font-size: 12pt;
+    line-height: 1.4;
+    padding: 0;
+    margin: 0;
+  }
+
+  .container {
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+    border: none;
+  }
+
+  h2 {
+    font-size: 16pt;
+    text-transform: uppercase;
+    text-align: center;
+    border-bottom: 2px solid #000;
+    padding-bottom: 5px;
+    margin-top: 0;
+    margin-bottom: 15px;
+  }
+
+  .print-header {
+    margin-bottom: 20px;
+    border: 2px solid #000;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 11pt;
+  }
+
+  .print-header strong {
+    margin-right: 5px;
+  }
+
+  .info-card {
+    border: 1px solid #000;
+    padding: 10px;
+    margin-bottom: 15px;
+    background-color: transparent !important;
+  }
+
+  .info-card h3 {
+    margin-top: 0;
+    font-size: 12pt;
+    border-bottom: 1px dashed #000;
+    padding-bottom: 5px;
+  }
+
+  .info-card p {
+    margin: 5px 0;
+  }
+
+  .phase-section {
+    border: 1px solid #000;
+    margin-bottom: 15px;
+    page-break-inside: avoid;
+  }
+
+  .phase-header {
+    background-color: #e0e0e0 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    color: #000;
+    font-size: 12pt;
+    font-weight: bold;
+    padding: 8px;
+    border-bottom: 1px solid #000;
+    text-transform: uppercase;
+  }
+
+  .phase-content {
+    padding: 0;
+  }
+
+  .drug-row {
+    display: flex;
+    border-bottom: 1px solid #ccc;
+    padding: 8px;
+    margin: 0;
+    align-items: center;
+  }
+
+  .drug-row:last-child {
+    border-bottom: none;
+  }
+
+  /* Force inputs to look like plain text in print */
+  input, textarea, select {
+    border: none !important;
+    background: transparent !important;
+    color: #000 !important;
+    font-family: inherit;
+    font-size: inherit;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: auto;
+    -webkit-appearance: none;
+    appearance: none;
+    resize: none;
+    box-shadow: none !important;
+    outline: none !important;
+  }
+
+  /* Specifically style the input fields within drug-row to align perfectly */
+  .drug-row input.drug-name {
+    flex: 2.5;
+    font-weight: bold;
+  }
+  .drug-row input.drug-dose {
+    flex: 0.8;
+    text-align: right;
+    padding-right: 5px !important;
+  }
+  .drug-row span.drug-unit {
+    flex: 0.8;
+    padding-left: 2px;
+  }
+  .drug-row input.drug-route {
+    flex: 1.5;
+    text-align: center;
+  }
+  .drug-row input.drug-time {
+    flex: 2;
+    text-align: left;
+    padding-left: 10px !important;
+  }
+
+  .alert.error {
+    border: 2px solid #000;
+    color: #000;
+    background-color: transparent;
+    font-weight: bold;
+    text-transform: uppercase;
+    text-align: center;
+  }
+
+  .signature-section.show-on-print {
+    display: flex !important;
+    justify-content: space-around;
+    margin-top: 50px;
+    page-break-inside: avoid;
+  }
+
+  .sig-box {
+    border-top: 1px solid #000;
+    width: 250px;
+    text-align: center;
+    padding-top: 5px;
+    font-weight: bold;
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "id": "pembrolizumab",
+  "name": "Pembrolizumab (Monoterapi)",
+  "phases": {
+    "home_pre_meds": [],
+    "pre_meds": [],
+    "chemotherapy": [
+      { "drug": "Pembrolizumab", "flat_dose": 200, "unit": "mg", "route": "IV Infüzyon", "duration": "30 min" }
+    ],
+    "post_meds": [],
+    "home_post_meds": []
+  }
+}

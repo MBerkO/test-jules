@@ -1,0 +1,9 @@
+chemoapp/node_modules/
+node_modules/
+.DS_Store
+data/logs/*
+data/orders/*
+data/patients/*
+node_modules/
+
+chemoapp/node_modules/

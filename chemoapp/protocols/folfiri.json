@@ -1,0 +1,22 @@
+{
+  "id": "folfiri",
+  "name": "FOLFIRI",
+  "phases": {
+    "home_pre_meds": [],
+    "pre_meds": [
+      { "drug": "Ondansetron", "dose": 8, "unit": "mg", "route": "IV", "duration": "15 min" },
+      { "drug": "Dexamethasone", "dose": 12, "unit": "mg", "route": "IV", "duration": "15 min" },
+      { "drug": "Atropine", "dose": 0.25, "unit": "mg", "route": "SC", "duration": "İrinotekan öncesi (Kolinerjik sendrom profilaksisi)" }
+    ],
+    "chemotherapy": [
+      { "drug": "Irinotecan", "dose_per_bsa": 180, "unit": "mg/m²", "route": "IV Infüzyon", "duration": "90 min" },
+      { "drug": "Leucovorin", "dose_per_bsa": 400, "unit": "mg/m²", "route": "IV Infüzyon", "duration": "2 saat" },
+      { "drug": "5-Fluorouracil (Bolus)", "dose_per_bsa": 400, "unit": "mg/m²", "route": "IV Bolus", "duration": "5 min" },
+      { "drug": "5-Fluorouracil (İnfüzyon)", "dose_per_bsa": 2400, "unit": "mg/m²", "route": "IV İnfüzyon (Pompa)", "duration": "46 saat" }
+    ],
+    "post_meds": [],
+    "home_post_meds": [
+      { "drug": "Loperamide", "dose": "2mg", "frequency": "İshal durumunda", "duration": "İhtiyaç halinde" }
+    ]
+  }
+}
