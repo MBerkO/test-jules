@@ -37,6 +37,30 @@ app.get('/api/protocols', (req, res) => {
   }
 });
 
+// POST /api/protocols - Create a new protocol
+app.post('/api/protocols', (req, res) => {
+  const newProtocol = req.body;
+  if (!newProtocol || !newProtocol.id || !newProtocol.name || !newProtocol.phases) {
+    return res.status(400).json({ success: false, message: 'Invalid protocol structure. Must include id, name, and phases.' });
+  }
+
+  try {
+    const safeId = path.basename(newProtocol.id); // Prevent path traversal
+    const filePath = path.join(PROTOCOLS_DIR, `${safeId}.json`);
+
+    // Check if it already exists to avoid overwriting accidentally, or you can allow it
+    if (fs.existsSync(filePath)) {
+       return res.status(400).json({ success: false, message: 'Protocol with this ID already exists. Please choose a different ID.' });
+    }
+
+    fs.writeFileSync(filePath, JSON.stringify(newProtocol, null, 2));
+    res.json({ success: true, message: 'Protocol successfully created.' });
+  } catch (err) {
+    console.error('Failed to save new protocol:', err);
+    res.status(500).json({ success: false, message: 'Failed to save new protocol.' });
+  }
+});
+
 // GET /api/protocols/:id - Get specific protocol
 app.get('/api/protocols/:id', (req, res) => {
   try {

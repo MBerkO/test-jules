@@ -55,13 +55,54 @@
 
         <div class="form-group">
           <label for="protocolSelect">Kemoterapi Protokolü Seçin</label>
-          <select id="protocolSelect" required>
-            <option value="">-- Protokol Yükleniyor --</option>
-          </select>
+          <div style="display: flex; gap: 10px;">
+            <select id="protocolSelect" required style="flex: 1;">
+              <option value="">-- Protokol Yükleniyor --</option>
+            </select>
+            <button type="button" id="openCreateProtocolBtn" class="btn secondary">Yeni Protokol Oluştur</button>
+          </div>
         </div>
         <button type="submit" class="btn primary">Dozları Hesapla</button>
       </form>
     </section>
+
+    <!-- Modal: Yeni Protokol Oluşturma -->
+    <div id="createProtocolModal" class="modal hidden hide-on-print">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Yeni Protokol Oluştur</h2>
+          <span class="close-modal">&times;</span>
+        </div>
+        <div class="modal-body">
+          <form id="createProtocolForm">
+            <div class="form-group">
+              <label for="newProtocolName">Protokol Adı (Örn: R-CHOP)</label>
+              <input type="text" id="newProtocolName" required>
+            </div>
+            <div class="form-group">
+              <label for="newProtocolId">Protokol ID (Boşluksuz, küçük harf, örn: r-chop)</label>
+              <input type="text" id="newProtocolId" required pattern="^[a-z0-9_-]+$">
+            </div>
+
+            <div class="protocol-builder">
+              <h3>İlaçlar</h3>
+              <p style="font-size: 0.9em; color: var(--secondary-color);">Protokole eklenecek her bir ilacın dozunu ve hangi fazda (Pre-medikasyon, Kemoterapi vb.) uygulanacağını seçin.</p>
+
+              <div id="drugListContainer">
+                <!-- Dinamik İlaç Satırları -->
+              </div>
+
+              <button type="button" id="addDrugRowBtn" class="btn secondary" style="margin-top: 10px;">+ İlaç Ekle</button>
+            </div>
+
+            <div style="margin-top: 20px; text-align: right;">
+              <button type="button" id="cancelCreateBtn" class="btn secondary">İptal</button>
+              <button type="submit" class="btn success">Protokolü JSON Olarak Kaydet</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
 
     <!-- Adım 2: Hesaplama Sonuçları, Manuel Düzenleme ve Onay -->
     <section id="step2" class="wizard-step">

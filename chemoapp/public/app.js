@@ -13,6 +13,15 @@ const printBtn = document.getElementById('printBtn');
 const approveBtn = document.getElementById('approveBtn');
 const safetyWarning = document.getElementById('safetyWarning');
 
+// Modal DOM Elements
+const openCreateProtocolBtn = document.getElementById('openCreateProtocolBtn');
+const createProtocolModal = document.getElementById('createProtocolModal');
+const closeBtn = document.querySelector('.close-modal');
+const cancelCreateBtn = document.getElementById('cancelCreateBtn');
+const createProtocolForm = document.getElementById('createProtocolForm');
+const drugListContainer = document.getElementById('drugListContainer');
+const addDrugRowBtn = document.getElementById('addDrugRowBtn');
+
 // Theme Management
 function toggleTheme() {
   const isDark = document.body.getAttribute('data-theme') === 'dark';
@@ -21,13 +30,8 @@ function toggleTheme() {
 
 themeBtn.addEventListener('click', toggleTheme);
 
-// Initialize (Load Protocols and check system theme)
-window.onload = async () => {
-  // Check system preference for dark mode
-  if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-    document.body.setAttribute('data-theme', 'dark');
-  }
-
+// Load Protocols
+async function loadProtocols() {
   try {
     const res = await fetch(`${API_BASE}/protocols`);
     const data = await res.json();
@@ -44,7 +48,135 @@ window.onload = async () => {
     console.error('Failed to load protocols', err);
     protocolSelect.innerHTML = '<option value="">Hata: Protokoller yüklenemedi</option>';
   }
+}
+
+// Initialize (Load Protocols and check system theme)
+window.onload = async () => {
+  // Check system preference for dark mode
+  if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    document.body.setAttribute('data-theme', 'dark');
+  }
+  await loadProtocols();
 };
+
+// --- Modal and Protocol Creation Logic ---
+openCreateProtocolBtn.addEventListener('click', () => {
+  createProtocolModal.classList.remove('hidden');
+});
+
+function closeModal() {
+  createProtocolModal.classList.add('hidden');
+  createProtocolForm.reset();
+  drugListContainer.innerHTML = ''; // Clear rows
+}
+
+closeBtn.addEventListener('click', closeModal);
+cancelCreateBtn.addEventListener('click', closeModal);
+
+window.addEventListener('click', (e) => {
+  if (e.target === createProtocolModal) {
+    closeModal();
+  }
+});
+
+addDrugRowBtn.addEventListener('click', () => {
+  const row = document.createElement('div');
+  row.className = 'builder-row';
+  row.innerHTML = `
+    <button type="button" class="remove-drug-btn" onclick="this.parentElement.remove()">X</button>
+    <select class="drugPhase" required>
+      <option value="" disabled selected>Faz Seç</option>
+      <option value="home_pre_meds">Ev Pre-Medikasyon</option>
+      <option value="pre_meds">Hastane Pre-Medikasyon</option>
+      <option value="chemotherapy">Kemoterapi İlacı</option>
+      <option value="post_meds">Hastane Post-Medikasyon</option>
+      <option value="home_post_meds">Ev Post-Medikasyon</option>
+    </select>
+    <input type="text" class="drugName" placeholder="İlaç Adı" required>
+    <select class="drugCalcType" required onchange="toggleDoseInputs(this)">
+      <option value="" disabled selected>Hesap Türü</option>
+      <option value="bsa">BSA Göre (mg/m²)</option>
+      <option value="flat">Sabit Doz</option>
+    </select>
+    <input type="number" step="0.01" class="drugDose" placeholder="Doz" required>
+    <input type="text" class="drugUnit" placeholder="Birim (örn: mg)" required>
+    <input type="text" class="drugRoute" placeholder="Yol (örn: IV)">
+    <input type="text" class="drugDuration" placeholder="Süre/Sıklık (örn: 15 min)">
+  `;
+  drugListContainer.appendChild(row);
+});
+
+// Helper for UI to switch between placeholder types
+window.toggleDoseInputs = function(selectElem) {
+  const row = selectElem.parentElement;
+  const doseInput = row.querySelector('.drugDose');
+  if (selectElem.value === 'bsa') {
+    doseInput.placeholder = 'Doz (mg/m²)';
+  } else {
+    doseInput.placeholder = 'Sabit Doz';
+  }
+};
+
+createProtocolForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const id = document.getElementById('newProtocolId').value.trim();
+  const name = document.getElementById('newProtocolName').value.trim();
+
+  const phases = {
+    home_pre_meds: [],
+    pre_meds: [],
+    chemotherapy: [],
+    post_meds: [],
+    home_post_meds: []
+  };
+
+  const rows = drugListContainer.querySelectorAll('.builder-row');
+  rows.forEach(row => {
+    const phase = row.querySelector('.drugPhase').value;
+    const calcType = row.querySelector('.drugCalcType').value;
+    const drugName = row.querySelector('.drugName').value.trim();
+    const doseVal = parseFloat(row.querySelector('.drugDose').value);
+    const unit = row.querySelector('.drugUnit').value.trim();
+    const route = row.querySelector('.drugRoute').value.trim();
+    const duration = row.querySelector('.drugDuration').value.trim();
+
+    const drugObj = { drug: drugName, unit, route, duration };
+
+    if (calcType === 'bsa') {
+      drugObj.dose_per_bsa = doseVal;
+    } else {
+      // Flat dose or standard dose
+      if (phase === 'chemotherapy') drugObj.flat_dose = doseVal;
+      else drugObj.dose = doseVal;
+    }
+
+    phases[phase].push(drugObj);
+  });
+
+  const newProtocol = { id, name, phases };
+
+  try {
+    const res = await fetch(`${API_BASE}/protocols`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newProtocol)
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      alert('Protokol başarıyla eklendi!');
+      closeModal();
+      await loadProtocols(); // Reload dropdown
+      protocolSelect.value = id; // Auto-select new protocol
+    } else {
+      alert('Hata: ' + data.message);
+    }
+  } catch (err) {
+    console.error(err);
+    alert('Sunucu hatası. Protokol kaydedilemedi.');
+  }
+});
 
 // Form Submission -> API Calculation
 patientForm.addEventListener('submit', async (e) => {

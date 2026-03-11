@@ -1,0 +1,16 @@
+{
+  "id": "test_protocol",
+  "name": "Test Protocol",
+  "phases": {
+    "home_pre_meds": [],
+    "pre_meds": [],
+    "chemotherapy": [
+      {
+        "drug": "TestDrug",
+        "dose": 10
+      }
+    ],
+    "post_meds": [],
+    "home_post_meds": []
+  }
+}
