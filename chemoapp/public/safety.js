@@ -1,18 +1,13 @@
-const fs = require('fs');
-const path = require('path');
-
-const PATIENTS_DIR = path.join(__dirname, '..', 'data', 'patients');
-
 /**
  * Checks the cumulative dose for Anthracyclines.
- * E.g., Doxorubicin max lifetime dose is ~450-500 mg/m2.
+ * Reads patient history from localStorage.
  *
- * @param {string} patientId - The ID of the patient.
+ * @param {string} patientName - The name of the patient.
  * @param {Array} proposedChemotherapy - The chemotherapy array from the current order.
  * @param {number} bsa - Current Body Surface Area.
  * @returns {object} Status object indicating if a warning is needed.
  */
-function checkCumulativeAnthracycline(patientId, proposedChemotherapy, bsa) {
+function checkCumulativeAnthracycline(patientName, proposedChemotherapy, bsa) {
   let warningMessage = null;
   let isExceeded = false;
   let proposedAnthracyclineDose = 0;
@@ -23,17 +18,20 @@ function checkCumulativeAnthracycline(patientId, proposedChemotherapy, bsa) {
   if (anthracyclineDrug) {
     proposedAnthracyclineDose = anthracyclineDrug.calculated_dose; // mg
 
-    // Read patient history (mock up logic)
-    const patientFile = path.join(PATIENTS_DIR, `${patientId}.json`);
+    // Read patient history from localStorage
     let previousCumulativeDose = 0;
-
-    if (fs.existsSync(patientFile)) {
-      try {
-         const patientData = JSON.parse(fs.readFileSync(patientFile, 'utf8'));
-         previousCumulativeDose = patientData.cumulative_anthracycline_mg || 0;
-      } catch (err) {
-         console.error("Error reading patient history:", err);
-      }
+    try {
+        const patientsDataStr = localStorage.getItem('chemoapp_patients');
+        if (patientsDataStr) {
+            const patientsData = JSON.parse(patientsDataStr);
+            const patientId = patientName.toLowerCase().replace(/\s+/g, '-');
+            const patientData = patientsData[patientId];
+            if (patientData && patientData.cumulative_anthracycline_mg) {
+                previousCumulativeDose = patientData.cumulative_anthracycline_mg;
+            }
+        }
+    } catch (e) {
+        console.error("Error reading patient history from local storage:", e);
     }
 
     const totalProposedLifetimeMg = previousCumulativeDose + proposedAnthracyclineDose;
@@ -51,7 +49,3 @@ function checkCumulativeAnthracycline(patientId, proposedChemotherapy, bsa) {
     warningMessage
   };
 }
-
-module.exports = {
-  checkCumulativeAnthracycline
-};
