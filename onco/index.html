@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Onco - Onkoloji Literatürü</title>
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #333333;
+            --link-color: #0066cc;
+            --link-hover: #004499;
+            --border-color: #eeeeee;
+            --btn-bg: #f5f5f5;
+            --btn-hover: #e0e0e0;
+            --panel-bg: #fafafa;
+            --loader-color: #0066cc;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #121212;
+                --text-color: #e0e0e0;
+                --link-color: #66b3ff;
+                --link-hover: #99ccff;
+                --border-color: #333333;
+                --btn-bg: #1e1e1e;
+                --btn-hover: #2c2c2c;
+                --panel-bg: #1a1a1a;
+                --loader-color: #66b3ff;
+            }
+        }
+
+        body.light-mode {
+            --bg-color: #ffffff;
+            --text-color: #333333;
+            --link-color: #0066cc;
+            --link-hover: #004499;
+            --border-color: #eeeeee;
+            --btn-bg: #f5f5f5;
+            --btn-hover: #e0e0e0;
+            --panel-bg: #fafafa;
+            --loader-color: #0066cc;
+        }
+
+        body.dark-mode {
+            --bg-color: #121212;
+            --text-color: #e0e0e0;
+            --link-color: #66b3ff;
+            --link-hover: #99ccff;
+            --border-color: #333333;
+            --btn-bg: #1e1e1e;
+            --btn-hover: #2c2c2c;
+            --panel-bg: #1a1a1a;
+            --loader-color: #66b3ff;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            font-weight: 500;
+        }
+
+        .layout {
+            display: flex;
+            gap: 2rem;
+            flex: 1;
+        }
+
+        @media (max-width: 768px) {
+            .layout {
+                flex-direction: column;
+            }
+        }
+
+        .sidebar {
+            width: 250px;
+            flex-shrink: 0;
+            background-color: var(--panel-bg);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            height: fit-content;
+        }
+
+        .main-content {
+            flex: 1;
+        }
+
+        .filter-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .filter-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        select, input[type="text"] {
+            width: 100%;
+            padding: 0.6rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-size: 0.9rem;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: var(--btn-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            width: 100%;
+            margin-top: 1rem;
+            font-weight: 500;
+        }
+
+        header button {
+            width: auto;
+            margin-top: 0;
+        }
+
+        button:hover {
+            background-color: var(--btn-hover);
+        }
+
+        .search-bar-container {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .search-bar-container input {
+            flex: 1;
+            padding: 0.8rem 1rem;
+            font-size: 1.1rem;
+            border-radius: 6px;
+        }
+
+        .search-bar-container button {
+            width: auto;
+            margin-top: 0;
+            padding: 0 1.5rem;
+            font-size: 1.1rem;
+        }
+
+        .article-card {
+            background-color: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: box-shadow 0.2s ease;
+        }
+
+        .article-card:hover {
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .article-title {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.2rem;
+            line-height: 1.4;
+        }
+
+        .article-title a {
+            color: var(--link-color);
+            text-decoration: none;
+        }
+
+        .article-title a:hover {
+            text-decoration: underline;
+            color: var(--link-hover);
+        }
+
+        .article-meta {
+            font-size: 0.9rem;
+            color: #777;
+            margin-bottom: 0.8rem;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .article-meta { color: #aaa; }
+        }
+
+        .article-authors {
+            font-style: italic;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .article-abstract {
+            font-size: 0.95rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.5;
+        }
+
+        .status-message {
+            text-align: center;
+            padding: 2rem;
+            font-size: 1.1rem;
+            color: #777;
+        }
+
+        .loader {
+            border: 4px solid var(--border-color);
+            border-top: 4px solid var(--loader-color);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 2rem auto;
+            display: none;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+        }
+
+        .pagination button {
+            width: auto;
+            margin-top: 0;
+            padding: 0.5rem 1rem;
+        }
+
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        #results-container {
+            min-height: 200px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Onco - Onkoloji Literatürü</h1>
+            <div>
+                <a href="../" style="margin-right: 15px; text-decoration: none; color: inherit; font-size: 0.9rem;">&larr; Projeler</a>
+                <button id="theme-toggle" aria-label="Temayı Değiştir">Tema Değiştir</button>
+            </div>
+        </header>
+
+        <div class="search-bar-container">
+            <input type="text" id="search-input" placeholder="Anahtar kelime, hastalık veya yazar arayın (örn: breast cancer, immunotherapy)..." onkeypress="handleKeyPress(event)">
+            <button onclick="performSearch()">Ara</button>
+        </div>
+
+        <div class="layout">
+            <aside class="sidebar">
+                <div class="filter-group">
+                    <label class="filter-label" for="filter-year">Yayın Yılı</label>
+                    <select id="filter-year">
+                        <option value="">Tümü</option>
+                        <option value="1">Son 1 Yıl</option>
+                        <option value="3">Son 3 Yıl</option>
+                        <option value="5">Son 5 Yıl</option>
+                        <option value="10">Son 10 Yıl</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label" for="filter-type">Yayın Türü</label>
+                    <select id="filter-type">
+                        <option value="">Tümü</option>
+                        <option value="Clinical Trial">Klinik Araştırma</option>
+                        <option value="Review">Derleme (Review)</option>
+                        <option value="Meta-Analysis">Meta-Analiz</option>
+                        <option value="Case Reports">Olgu Sunumu</option>
+                        <option value="Guidelines">Kılavuz (Guidelines)</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label" for="filter-journal">Dergi Adı</label>
+                    <input type="text" id="filter-journal" placeholder="Örn: Lancet Oncology">
+                </div>
+
+                <button onclick="performSearch()">Filtreleri Uygula</button>
+                <button onclick="clearFilters()" style="margin-top: 0.5rem; background-color: transparent;">Filtreleri Temizle</button>
+            </aside>
+
+            <main class="main-content">
+                <div id="loader" class="loader"></div>
+                <div id="results-container">
+                    <div class="status-message">Arama yapmak için bir anahtar kelime girin veya doğrudan "Ara" butonuna tıklayarak en güncel onkoloji literatürünü görün.</div>
+                </div>
+                <div id="pagination-container" class="pagination" style="display: none;">
+                    <button id="prev-btn" onclick="prevPage()">Önceki</button>
+                    <span id="page-info" style="align-self: center; font-size: 0.9rem;">Sayfa 1</span>
+                    <button id="next-btn" onclick="nextPage()">Sonraki</button>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Tema Ayarları
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)");
+
+        function applyTheme(theme) {
+            document.body.classList.remove('light-mode', 'dark-mode');
+            if (theme) {
+                document.body.classList.add(theme + '-mode');
+                localStorage.setItem("theme", theme);
+            } else {
+                localStorage.removeItem("theme");
+            }
+        }
+
+        const currentTheme = localStorage.getItem("theme");
+        if (currentTheme) {
+            applyTheme(currentTheme);
+        }
+
+        themeToggleBtn.addEventListener("click", function() {
+            let newTheme;
+            if (document.body.classList.contains("dark-mode")) {
+                newTheme = "light";
+            } else if (document.body.classList.contains("light-mode")) {
+                newTheme = "dark";
+            } else {
+                newTheme = prefersDarkScheme.matches ? "light" : "dark";
+            }
+            applyTheme(newTheme);
+        });
+
+        // PubMed API Ayarları
+        const BASE_URL = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/';
+        const RETMAX = 10; // Sayfa başına makale sayısı
+        let currentPage = 1;
+        let currentQuery = '';
+        let totalResults = 0;
+
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        }
+
+        function clearFilters() {
+            document.getElementById('filter-year').value = '';
+            document.getElementById('filter-type').value = '';
+            document.getElementById('filter-journal').value = '';
+        }
+
+        function buildPubMedQuery() {
+            let searchTerm = document.getElementById('search-input').value.trim();
+            const yearFilter = document.getElementById('filter-year').value;
+            const typeFilter = document.getElementById('filter-type').value;
+            const journalFilter = document.getElementById('filter-journal').value.trim();
+
+            // Default to 'oncology OR cancer' if search is empty to show general lit
+            let queryTerms = [];
+            if (searchTerm) {
+                queryTerms.push(`(${searchTerm})`);
+            } else {
+                queryTerms.push(`("oncology"[MeSH Terms] OR "neoplasms"[MeSH Terms] OR cancer)`);
+            }
+
+            if (typeFilter) {
+                queryTerms.push(`("${typeFilter}"[Publication Type])`);
+            }
+
+            if (journalFilter) {
+                queryTerms.push(`("${journalFilter}"[Journal])`);
+            }
+
+            let dateFilter = '';
+            if (yearFilter) {
+                dateFilter = `&datetype=pdat&reldate=${yearFilter * 365}`; // Approx days
+            }
+
+            return {
+                term: queryTerms.join(' AND '),
+                dateParams: dateFilter
+            };
+        }
+
+        async function performSearch(page = 1) {
+            currentPage = page;
+            const resultsContainer = document.getElementById('results-container');
+            const loader = document.getElementById('loader');
+            const paginationContainer = document.getElementById('pagination-container');
+
+            resultsContainer.innerHTML = '';
+            paginationContainer.style.display = 'none';
+            loader.style.display = 'block';
+
+            const queryObj = buildPubMedQuery();
+            const retstart = (currentPage - 1) * RETMAX;
+
+            try {
+                // 1. ESearch: Arama yap ve ID'leri al
+                const searchUrl = `${BASE_URL}esearch.fcgi?db=pubmed&term=${encodeURIComponent(queryObj.term)}${queryObj.dateParams}&retmode=json&retmax=${RETMAX}&retstart=${retstart}&sort=date`;
+
+                const searchResponse = await fetch(searchUrl);
+                const searchData = await searchResponse.json();
+
+                if (!searchData.esearchresult || !searchData.esearchresult.idlist || searchData.esearchresult.idlist.length === 0) {
+                    loader.style.display = 'none';
+                    resultsContainer.innerHTML = '<div class="status-message">Arama kriterlerinize uygun makale bulunamadı. Lütfen farklı anahtar kelimeler veya filtreler deneyin.</div>';
+                    return;
+                }
+
+                totalResults = parseInt(searchData.esearchresult.count, 10);
+                const ids = searchData.esearchresult.idlist.join(',');
+
+                // 2. ESummary: Bulunan ID'lerin özet verilerini al
+                const summaryUrl = `${BASE_URL}esummary.fcgi?db=pubmed&id=${ids}&retmode=json`;
+                const summaryResponse = await fetch(summaryUrl);
+                const summaryData = await summaryResponse.json();
+
+                loader.style.display = 'none';
+                displayResults(summaryData.result, searchData.esearchresult.idlist);
+                updatePagination();
+
+            } catch (error) {
+                console.error("PubMed API Hatası:", error);
+                loader.style.display = 'none';
+                resultsContainer.innerHTML = `<div class="status-message" style="color: #d32f2f;">Veriler çekilirken bir hata oluştu. Lütfen bağlantınızı kontrol edip tekrar deneyin.<br><small>${error.message}</small></div>`;
+            }
+        }
+
+        function displayResults(resultData, idList) {
+            const resultsContainer = document.getElementById('results-container');
+
+            // Sonuç başlığını ekle
+            const startIdx = (currentPage - 1) * RETMAX + 1;
+            const endIdx = Math.min(currentPage * RETMAX, totalResults);
+
+            const headerDiv = document.createElement('div');
+            headerDiv.style.marginBottom = '1rem';
+            headerDiv.style.fontSize = '0.95rem';
+            headerDiv.style.color = '#666';
+            headerDiv.innerHTML = `Toplam <strong>${totalResults.toLocaleString()}</strong> sonuç bulundu. (${startIdx} - ${endIdx} gösteriliyor)`;
+            resultsContainer.appendChild(headerDiv);
+
+            idList.forEach(id => {
+                const article = resultData[id];
+                if (!article) return;
+
+                const title = article.title || 'Başlıksız Makale';
+                const journal = article.fulljournalname || article.source || 'Bilinmeyen Dergi';
+                const pubDate = article.pubdate ? article.pubdate.split(' ')[0] : 'Tarih Yok'; // Yılı veya Yıl+Ay al
+
+                let authorsStr = '';
+                if (article.authors && article.authors.length > 0) {
+                    const authorNames = article.authors.map(a => a.name);
+                    authorsStr = authorNames.join(', ');
+                    if (authorsStr.length > 100) {
+                        authorsStr = authorsStr.substring(0, 100) + ' et al.';
+                    }
+                } else {
+                    authorsStr = 'Yazar bilgisi yok';
+                }
+
+                const pubmedLink = `https://pubmed.ncbi.nlm.nih.gov/${id}/`;
+
+                // Abstract eutilities efetch ile alınabilir ama çok yavaşlatır.
+                // PubType'ı göstermek iyi olabilir
+                let pubType = '';
+                if(article.pubtype && article.pubtype.length > 0) {
+                    pubType = article.pubtype.filter(t => t !== "Journal Article").join(', ');
+                }
+
+                const card = document.createElement('div');
+                card.className = 'article-card';
+                card.innerHTML = `
+                    <h2 class="article-title"><a href="${pubmedLink}" target="_blank" rel="noopener noreferrer">${title}</a></h2>
+                    <div class="article-authors">${authorsStr}</div>
+                    <div class="article-meta">
+                        <strong>${journal}</strong> | ${pubDate}
+                        ${pubType ? `| <span style="color: #888;">${pubType}</span>` : ''}
+                        | <span style="color: #888;">PMID: ${id}</span>
+                    </div>
+                `;
+                resultsContainer.appendChild(card);
+            });
+        }
+
+        function updatePagination() {
+            const paginationContainer = document.getElementById('pagination-container');
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const pageInfo = document.getElementById('page-info');
+
+            if (totalResults > 0) {
+                paginationContainer.style.display = 'flex';
+                pageInfo.textContent = `Sayfa ${currentPage}`;
+
+                prevBtn.disabled = currentPage === 1;
+
+                const totalPages = Math.ceil(totalResults / RETMAX);
+                nextBtn.disabled = currentPage >= totalPages;
+            } else {
+                paginationContainer.style.display = 'none';
+            }
+        }
+
+        function prevPage() {
+            if (currentPage > 1) {
+                performSearch(currentPage - 1);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function nextPage() {
+            const totalPages = Math.ceil(totalResults / RETMAX);
+            if (currentPage < totalPages) {
+                performSearch(currentPage + 1);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        // İlk açılışta güncel makaleleri getir
+        window.onload = () => {
+            // İsteğe bağlı olarak ilk açılışta hemen arama yapabiliriz
+            // performSearch();
+        };
+
+    </script>
+</body>
+</html>
