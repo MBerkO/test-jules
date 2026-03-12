@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Projelerim</title>
+    <title>NCCN Guidelines Downloader</title>
     <style>
         :root {
             --bg-color: #ffffff;
@@ -80,34 +80,9 @@
             font-weight: 500;
         }
 
-        button {
-            background-color: var(--btn-bg);
-            border: 1px solid var(--border-color);
-            color: var(--text-color);
-            padding: 0.4rem 0.8rem;
-            cursor: pointer;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            transition: all 0.2s ease;
-        }
-
-        button:hover {
-            background-color: var(--btn-hover);
-        }
-
-        ul {
-            list-style-type: none;
-            padding: 0;
-        }
-
-        li {
-            margin-bottom: 0.8rem;
-        }
-
         a {
             color: var(--link-color);
             text-decoration: none;
-            font-size: 1.1rem;
             transition: color 0.2s ease;
         }
 
@@ -116,60 +91,77 @@
             text-decoration: underline;
         }
 
-        .empty-state {
-            color: #888;
-            font-style: italic;
+        .back-link {
+            display: inline-block;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
         }
+
+        .info-box {
+            padding: 1.5rem;
+            background-color: var(--btn-bg);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .github-link {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            background-color: var(--link-color);
+            color: white !important;
+            border-radius: 4px;
+            text-decoration: none !important;
+            font-weight: 500;
+        }
+
+        .github-link:hover {
+            background-color: var(--link-hover);
+        }
+
     </style>
 </head>
 <body>
     <div class="container">
+        <a href="../" class="back-link">← Ana Sayfaya Dön</a>
         <header>
-            <h1>Projelerim</h1>
-            <button id="theme-toggle" aria-label="Temayı Değiştir">Tema Değiştir</button>
+            <h1>NCCN Guidelines Downloader</h1>
         </header>
 
         <main>
-            <ul>
-                <li><a href="./chemoapp/">chemoapp</a></li>
-                <li><a href="./nccn/">nccn</a></li>
-                <li><a href="./piano/">piano</a></li>
-            </ul>
+            <div class="info-box">
+                <h2>Nasıl Kullanılır?</h2>
+                <p>Bu araç tamamen sunucusuz çalışır ve doğrudan GitHub Actions üzerinden tetiklenir.</p>
+                <ol>
+                    <li>Aşağıdaki butona tıklayarak GitHub Actions sayfasına gidin.</li>
+                    <li>Sol taraftaki listeden <strong>"NCCN Guidelines Downloader"</strong> iş akışını seçin.</li>
+                    <li><strong>"Run workflow"</strong> butonuna tıklayın.</li>
+                    <li>Açılan pencerede NCCN kullanıcı adınızı ve şifrenizi girerek işlemi başlatın.</li>
+                </ol>
+                <p>İşlem tamamlandığında PDF dosyaları otomatik olarak bu depodaki <code>downloads/</code> klasörüne eklenecektir.</p>
+
+                <a href="https://github.com/OWNER/REPO/actions/workflows/nccn-downloader.yml" class="github-link" target="_blank" rel="noopener noreferrer">
+                    GitHub Actions Sayfasına Git
+                </a>
+                <p style="font-size: 0.8rem; margin-top: 1rem; opacity: 0.7;">
+                    <em>Not: Yukarıdaki linkin doğru çalışması için reponun genel (public) bir adrese sahip olması veya adresi manuel olarak repo ayarlarınıza göre değiştirmeniz gerekebilir.</em>
+                </p>
+            </div>
         </main>
     </div>
 
     <script>
-        const themeToggleBtn = document.getElementById('theme-toggle');
+        // Apply theme from main page
+        const currentTheme = localStorage.getItem("theme");
         const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)");
 
-        const currentTheme = localStorage.getItem("theme");
         if (currentTheme === "dark") {
             document.body.classList.add("dark-mode");
         } else if (currentTheme === "light") {
             document.body.classList.add("light-mode");
+        } else if (prefersDarkScheme.matches) {
+            document.body.classList.add("dark-mode");
         }
-
-        themeToggleBtn.addEventListener("click", function() {
-            let theme;
-            if (document.body.classList.contains("dark-mode")) {
-                document.body.classList.remove("dark-mode");
-                document.body.classList.add("light-mode");
-                theme = "light";
-            } else if (document.body.classList.contains("light-mode")) {
-                document.body.classList.remove("light-mode");
-                document.body.classList.add("dark-mode");
-                theme = "dark";
-            } else {
-                if (prefersDarkScheme.matches) {
-                    document.body.classList.add("light-mode");
-                    theme = "light";
-                } else {
-                    document.body.classList.add("dark-mode");
-                    theme = "dark";
-                }
-            }
-            localStorage.setItem("theme", theme);
-        });
     </script>
 </body>
 </html>
