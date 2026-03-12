@@ -1,9 +1,0 @@
-node_modules/
-.DS_Store
-data/logs/*
-data/orders/*
-data/patients/*
-!data/logs/.gitkeep
-!data/orders/.gitkeep
-!data/patients/.gitkeep
-server.log
