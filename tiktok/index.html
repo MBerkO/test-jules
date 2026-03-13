@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TikTok Oynatıcı</title>
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #333333;
+            --link-color: #0066cc;
+            --link-hover: #004499;
+            --border-color: #eeeeee;
+            --btn-bg: #f5f5f5;
+            --btn-hover: #e0e0e0;
+            --input-bg: #ffffff;
+            --input-text: #333333;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #121212;
+                --text-color: #e0e0e0;
+                --link-color: #66b3ff;
+                --link-hover: #99ccff;
+                --border-color: #333333;
+                --btn-bg: #1e1e1e;
+                --btn-hover: #2c2c2c;
+                --input-bg: #1e1e1e;
+                --input-text: #e0e0e0;
+            }
+        }
+
+        body.light-mode {
+            --bg-color: #ffffff;
+            --text-color: #333333;
+            --link-color: #0066cc;
+            --link-hover: #004499;
+            --border-color: #eeeeee;
+            --btn-bg: #f5f5f5;
+            --btn-hover: #e0e0e0;
+            --input-bg: #ffffff;
+            --input-text: #333333;
+        }
+
+        body.dark-mode {
+            --bg-color: #121212;
+            --text-color: #e0e0e0;
+            --link-color: #66b3ff;
+            --link-hover: #99ccff;
+            --border-color: #333333;
+            --btn-bg: #1e1e1e;
+            --btn-hover: #2c2c2c;
+            --input-bg: #1e1e1e;
+            --input-text: #e0e0e0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 2rem;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 500;
+        }
+
+        .home-link {
+            color: var(--link-color);
+            text-decoration: none;
+            font-size: 0.9rem;
+            margin-right: 1rem;
+        }
+
+        .home-link:hover {
+            text-decoration: underline;
+            color: var(--link-hover);
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 2rem;
+        }
+
+        input[type="text"] {
+            flex-grow: 1;
+            padding: 0.8rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background-color: var(--input-bg);
+            color: var(--input-text);
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--link-color);
+        }
+
+        button {
+            background-color: var(--btn-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 0.8rem 1.5rem;
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        button:hover {
+            background-color: var(--btn-hover);
+        }
+
+        #video-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 300px;
+            border: 1px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .empty-state {
+            color: #888;
+            font-style: italic;
+            text-align: center;
+        }
+
+        .error-message {
+            color: #cc0000;
+            text-align: center;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .error-message {
+                color: #ff6666;
+            }
+        }
+        body.dark-mode .error-message {
+            color: #ff6666;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div style="display: flex; align-items: center;">
+                <a href="../" class="home-link">← Ana Sayfa</a>
+                <h1>TikTok Oynatıcı</h1>
+            </div>
+            <button id="theme-toggle" aria-label="Temayı Değiştir">Tema Değiştir</button>
+        </header>
+
+        <main>
+            <div class="controls">
+                <input type="text" id="tiktok-url" placeholder="TikTok video bağlantısını buraya yapıştırın..." aria-label="TikTok video bağlantısı">
+                <button id="play-btn">Oynat</button>
+            </div>
+
+            <div id="video-container">
+                <div class="empty-state">Video burada görüntülenecek.</div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Tema Değiştirme Mantığı
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)");
+
+        const currentTheme = localStorage.getItem("theme");
+        if (currentTheme === "dark") {
+            document.body.classList.add("dark-mode");
+        } else if (currentTheme === "light") {
+            document.body.classList.add("light-mode");
+        }
+
+        themeToggleBtn.addEventListener("click", function() {
+            let theme;
+            if (document.body.classList.contains("dark-mode")) {
+                document.body.classList.remove("dark-mode");
+                document.body.classList.add("light-mode");
+                theme = "light";
+            } else if (document.body.classList.contains("light-mode")) {
+                document.body.classList.remove("light-mode");
+                document.body.classList.add("dark-mode");
+                theme = "dark";
+            } else {
+                if (prefersDarkScheme.matches) {
+                    document.body.classList.add("light-mode");
+                    theme = "light";
+                } else {
+                    document.body.classList.add("dark-mode");
+                    theme = "dark";
+                }
+            }
+            localStorage.setItem("theme", theme);
+        });
+
+        // Video Oynatma Mantığı
+        const playBtn = document.getElementById('play-btn');
+        const urlInput = document.getElementById('tiktok-url');
+        const videoContainer = document.getElementById('video-container');
+
+        async function loadVideo(url) {
+            if (!url) return;
+
+            videoContainer.innerHTML = '<div class="empty-state">Yükleniyor...</div>';
+
+            try {
+                // TikTok OEmbed API'sini kullanıyoruz
+                const response = await fetch('https://www.tiktok.com/oembed?url=' + encodeURIComponent(url));
+
+                if (!response.ok) {
+                    throw new Error('Video bulunamadı veya bağlantı geçersiz.');
+                }
+
+                const data = await response.json();
+
+                if (data.html) {
+                    // Güvenlik açısından direk innerHTML'e basmak yerine DOMParser de kullanılabilirdi,
+                    // fakat TikTok embed kodu iframe ve script içerir. innerHTML'e ekleyip scripti ayrıca çalıştırmak gerekir.
+                    videoContainer.innerHTML = data.html;
+
+                    // Eklenen script tag'ini bulup çalıştırmamız gerekebilir,
+                    // çünkü innerHTML ile eklenen script'ler otomatik çalışmaz.
+                    const scripts = videoContainer.getElementsByTagName('script');
+                    for (let i = 0; i < scripts.length; i++) {
+                        const newScript = document.createElement('script');
+                        if (scripts[i].src) {
+                            newScript.src = scripts[i].src;
+                        } else {
+                            newScript.text = scripts[i].innerText;
+                        }
+                        document.body.appendChild(newScript);
+                    }
+                } else {
+                    throw new Error('Geçerli bir video içeriği alınamadı.');
+                }
+            } catch (error) {
+                console.error('Hata:', error);
+                videoContainer.innerHTML = `<div class="error-message">Hata: ${error.message}<br><br>Lütfen geçerli bir TikTok video bağlantısı girdiğinizden emin olun.</div>`;
+            }
+        }
+
+        playBtn.addEventListener('click', () => {
+            loadVideo(urlInput.value.trim());
+        });
+
+        urlInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                loadVideo(urlInput.value.trim());
+            }
+        });
+    </script>
+</body>
+</html>
