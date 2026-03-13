@@ -1,0 +1,4 @@
+127.0.0.1 - - [13/Mar/2026 14:48:37] "GET /onco-guidelines/index.html HTTP/1.1" 200 -
+127.0.0.1 - - [13/Mar/2026 14:48:37] "GET /onco-guidelines/style.css HTTP/1.1" 200 -
+127.0.0.1 - - [13/Mar/2026 14:48:37] "GET /onco-guidelines/app.js HTTP/1.1" 200 -
+127.0.0.1 - - [13/Mar/2026 14:48:37] "GET /onco-guidelines/data.json HTTP/1.1" 200 -
