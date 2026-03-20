@@ -86,8 +86,11 @@ function handleFileUpload(file) {
 
     const reader = new FileReader();
     reader.onload = async function(e) {
-        const typedarray = new Uint8Array(e.target.result);
-        currentPdfBytes = typedarray;
+        const arrayBuffer = e.target.result;
+        const typedarray = new Uint8Array(arrayBuffer);
+        // pdf-lib ArrayBuffer veya Uint8Array bekler, ancak Uint8Array referansını saklarken sorun olabilir.
+        // Güvenli olması için verinin kopyasını saklayalım
+        currentPdfBytes = new Uint8Array(arrayBuffer).slice(0);
 
         try {
             pdfDoc = await pdfjsLib.getDocument(typedarray).promise;
