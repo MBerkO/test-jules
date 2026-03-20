@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Düzenleyici</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="pdf.js"></script>
+    <script src="pdf-lib.min.js"></script>
+</head>
+<body>
+    <header>
+        <h1>PDF Düzenleyici</h1>
+        <div class="header-actions">
+            <button id="theme-toggle" aria-label="Temayı Değiştir">Tema Değiştir</button>
+            <button id="save-btn" style="display: none;" class="primary-btn">PDF'i Kaydet ve İndir</button>
+        </div>
+    </header>
+
+    <main>
+        <div class="upload-container" id="upload-container">
+            <div class="upload-box">
+                <p>Bir PDF dosyası seçin veya sürükleyip bırakın</p>
+                <input type="file" id="pdf-upload" accept="application/pdf">
+                <button onclick="document.getElementById('pdf-upload').click()">Dosya Seç</button>
+            </div>
+        </div>
+
+        <div class="editor-container" id="editor-container" style="display: none;">
+            <div class="toolbar">
+                <button id="prev-page" disabled>Önceki Sayfa</button>
+                <span id="page-info">Sayfa: <span id="page-num"></span> / <span id="page-count"></span></span>
+                <button id="next-page" disabled>Sonraki Sayfa</button>
+            </div>
+
+            <div class="canvas-wrapper">
+                <canvas id="pdf-render"></canvas>
+                <div id="text-layer"></div>
+            </div>
+        </div>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>
