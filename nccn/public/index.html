@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NCCN Rehber İndirici</title>
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #333333;
+            --input-bg: #f9f9f9;
+            --input-border: #cccccc;
+            --btn-bg: #007bff;
+            --btn-text: #ffffff;
+            --btn-hover: #0056b3;
+            --log-bg: #f4f4f4;
+            --log-border: #e0e0e0;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #1a1a1a;
+                --text-color: #f0f0f0;
+                --input-bg: #2a2a2a;
+                --input-border: #444444;
+                --btn-bg: #0056b3;
+                --btn-text: #ffffff;
+                --btn-hover: #007bff;
+                --log-bg: #222222;
+                --log-border: #333333;
+            }
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: var(--bg-color);
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 0;
+            font-size: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--input-border);
+            border-radius: 4px;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+
+        button {
+            width: 100%;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 4px;
+            background-color: var(--btn-bg);
+            color: var(--btn-text);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--btn-hover);
+        }
+
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            color: #666666;
+        }
+
+        #logs {
+            margin-top: 1.5rem;
+            background-color: var(--log-bg);
+            border: 1px solid var(--log-border);
+            border-radius: 4px;
+            padding: 1rem;
+            height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 0.85rem;
+        }
+
+        .log-entry {
+            margin-bottom: 0.25rem;
+        }
+
+        .log-info { color: var(--text-color); }
+        .log-error { color: #dc3545; }
+        .log-success { color: #28a745; }
+
+        @media (prefers-color-scheme: dark) {
+            .log-error { color: #ff6b6b; }
+            .log-success { color: #51cf66; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>NCCN Rehber İndirici</h1>
+        <form id="downloadForm">
+            <div class="form-group">
+                <label for="username">NCCN Kullanıcı Adı (E-posta)</label>
+                <input type="email" id="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">NCCN Şifresi</label>
+                <input type="password" id="password" required>
+            </div>
+            <div class="form-group">
+                <label for="downloadPath">Kayıt Klasörü</label>
+                <input type="text" id="downloadPath" placeholder="Örn: C:\Users\KullaniciAdi\Desktop\NCCN" required>
+            </div>
+            <button type="submit" id="startBtn">İndirmeye Başla</button>
+        </form>
+
+        <div id="logs"></div>
+    </div>
+
+    <script>
+        const logsDiv = document.getElementById('logs');
+        const startBtn = document.getElementById('startBtn');
+        const form = document.getElementById('downloadForm');
+
+        function appendLog(message, type = 'info') {
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${type}`;
+            const time = new Date().toLocaleTimeString();
+            entry.textContent = `[${time}] ${message}`;
+            logsDiv.appendChild(entry);
+            logsDiv.scrollTop = logsDiv.scrollHeight;
+        }
+
+        // Setup SSE for logs
+        const eventSource = new EventSource('/logs');
+        eventSource.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            appendLog(data.message, data.type);
+            if (data.type === 'success' || data.type === 'error') {
+                startBtn.disabled = false;
+            }
+        };
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const downloadPath = document.getElementById('downloadPath').value;
+
+            startBtn.disabled = true;
+            logsDiv.innerHTML = '';
+            appendLog('İşlem başlatılıyor...', 'info');
+
+            try {
+                const response = await fetch('/api/start', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password, downloadPath }),
+                });
+
+                const result = await response.json();
+                if (!response.ok) {
+                    appendLog(result.error || 'Bir hata oluştu', 'error');
+                    startBtn.disabled = false;
+                }
+            } catch (error) {
+                appendLog('Bağlantı hatası: ' + error.message, 'error');
+                startBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
