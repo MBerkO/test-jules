@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Flüt</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Flüt</h1>
+            <div class="controls-top">
+                <button id="fullscreen-btn" aria-label="Tam Ekran">Tam Ekran</button>
+            </div>
+        </header>
+
+        <div class="settings">
+            <div class="control-group">
+                <label for="volume">Ses:</label>
+                <input type="range" id="volume" min="0" max="1" step="0.01" value="0.5">
+            </div>
+            <div class="control-group">
+                <label for="octave">Oktav: <span id="octave-display">4</span></label>
+                <div class="octave-buttons">
+                    <button id="octave-down">-</button>
+                    <button id="octave-up">+</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="flute-container">
+            <div class="flute-body">
+                <!-- Flute holes -->
+                <button class="hole" data-note="C" data-key="A"><span>A</span></button>
+                <button class="hole" data-note="D" data-key="S"><span>S</span></button>
+                <button class="hole" data-note="E" data-key="D"><span>D</span></button>
+                <button class="hole" data-note="F" data-key="F"><span>F</span></button>
+                <button class="hole" data-note="G" data-key="G"><span>G</span></button>
+                <button class="hole" data-note="A" data-key="H"><span>H</span></button>
+                <button class="hole" data-note="B" data-key="J"><span>J</span></button>
+                <button class="hole" data-note="C-high" data-key="K"><span>K</span></button>
+            </div>
+        </div>
+
+        <div class="instructions">
+            <p>Ekrana dokunun veya klavye tuşlarını kullanın: A, S, D, F, G, H, J, K</p>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
