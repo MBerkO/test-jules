@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerçeğin Ötesinde (1997)</title>
+    <style>
+        :root {
+            --bg-color: #f4f4f6;
+            --card-bg: #ffffff;
+            --text-color: #222222;
+            --text-secondary: #666666;
+            --accent-color: #2563eb;
+            --accent-hover: #1d4ed8;
+            --border-color: #e5e7eb;
+            --btn-bg: #f3f4f6;
+            --btn-hover: #e5e7eb;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #0f172a;
+                --card-bg: #1e293b;
+                --text-color: #f8fafc;
+                --text-secondary: #94a3b8;
+                --accent-color: #3b82f6;
+                --accent-hover: #60a5fa;
+                --border-color: #334155;
+                --btn-bg: #334155;
+                --btn-hover: #475569;
+                --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            }
+        }
+
+        body.light-mode {
+            --bg-color: #f4f4f6;
+            --card-bg: #ffffff;
+            --text-color: #222222;
+            --text-secondary: #666666;
+            --accent-color: #2563eb;
+            --accent-hover: #1d4ed8;
+            --border-color: #e5e7eb;
+            --btn-bg: #f3f4f6;
+            --btn-hover: #e5e7eb;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
+        }
+
+        body.dark-mode {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-color: #3b82f6;
+            --accent-hover: #60a5fa;
+            --border-color: #334155;
+            --btn-bg: #334155;
+            --btn-hover: #475569;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            padding: 2rem 1.5rem;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 1.2rem;
+            display: inline-flex;
+            align-items: center;
+            transition: color 0.2s ease;
+        }
+
+        .back-link:hover {
+            color: var(--accent-color);
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.6rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 0.2rem;
+        }
+
+        .theme-toggle-btn {
+            background-color: var(--btn-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .theme-toggle-btn:hover {
+            background-color: var(--btn-hover);
+        }
+
+        .game-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .emulator-wrapper {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        iframe.emulator-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .meta-section {
+            padding: 1.5rem;
+            display: flex;
+            gap: 1.5rem;
+            align-items: flex-start;
+        }
+
+        @media (max-width: 640px) {
+            .meta-section {
+                flex-direction: column;
+            }
+        }
+
+        .cover-img {
+            width: 120px;
+            height: auto;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .game-info {
+            flex: 1;
+        }
+
+        .game-info h2 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .poem {
+            font-style: italic;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+            border-left: 3px solid var(--accent-color);
+            padding-left: 0.8rem;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 0.75rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.25rem;
+        }
+
+        .details-grid strong {
+            color: var(--text-color);
+        }
+
+        .actions {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background-color: var(--btn-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: var(--btn-hover);
+            color: var(--accent-color);
+        }
+
+        .btn-primary {
+            background-color: var(--accent-color);
+            color: #ffffff;
+            border-color: var(--accent-color);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-hover);
+            color: #ffffff;
+        }
+
+        footer {
+            margin-top: auto;
+            padding: 1.5rem 0;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border-color);
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-left">
+                <a href="../" class="back-link" title="Ana Sayfaya Dön">←</a>
+                <div>
+                    <h1>Gerçeğin Ötesinde</h1>
+                    <div class="subtitle">Beyond Reality (1997) — Cartoon Animasyon Stüdyoları</div>
+                </div>
+            </div>
+            <button id="theme-toggle" class="theme-toggle-btn" aria-label="Temayı Değiştir">Tema Değiştir</button>
+        </header>
+
+        <main>
+            <div class="game-card">
+                <div class="emulator-wrapper">
+                    <iframe
+                        class="emulator-frame"
+                        src="https://archive.org/embed/gerceginotesinde"
+                        allowfullscreen="true"
+                        webkitallowfullscreen="true"
+                        mozallowfullscreen="true">
+                    </iframe>
+                </div>
+
+                <div class="meta-section">
+                    <img src="cover.jpg" alt="Gerçeğin Ötesinde Ön Kapak" class="cover-img">
+                    <div class="game-info">
+                        <h2>Oyun Hakkında</h2>
+                        <div class="poem">
+                            Sessizliği parçalayan acı bir çığlık,<br>
+                            onu masum dünyasından ayırdı.<br>
+                            Heryer kan içindeydi.<br>
+                            Kendisi ölmediği için şanslı mıydı, yoksa şanssız mı ?<br>
+                            Artık yalnızdı !<br>
+                            Karanlığın ve korkunun fantastik dünyasında !
+                        </div>
+
+                        <div class="details-grid">
+                            <div><strong>Geliştirici:</strong> Cartoon Animasyon Stüdyoları</div>
+                            <div><strong>Yayın Yılı:</strong> 1997</div>
+                            <div><strong>Platform:</strong> PC CD-ROM (MS-DOS / Windows)</div>
+                            <div><strong>Tür:</strong> Macera (Adventure)</div>
+                        </div>
+
+                        <div class="actions">
+                            <a href="https://archive.org/download/gerceginotesinde/Booklet.pdf" target="_blank" rel="noopener noreferrer" class="btn">
+                                📖 Oyun Kitapçığı (PDF)
+                            </a>
+                            <a href="https://archive.org/download/gerceginotesinde/Front.jpg" target="_blank" rel="noopener noreferrer" class="btn">
+                                🖼️ Yüksek Çözünürlüklü Kapak
+                            </a>
+                            <a href="https://archive.org/details/gerceginotesinde" target="_blank" rel="noopener noreferrer" class="btn">
+                                🌐 Archive.org Sayfası
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <footer>
+        <p>Gerçeğin Ötesinde &copy; 1997 Cartoon Animasyon Stüdyoları</p>
+    </footer>
+
+    <script>
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)");
+
+        const currentTheme = localStorage.getItem("theme");
+        if (currentTheme === "dark") {
+            document.body.classList.add("dark-mode");
+        } else if (currentTheme === "light") {
+            document.body.classList.add("light-mode");
+        }
+
+        themeToggleBtn.addEventListener("click", function() {
+            let theme;
+            if (document.body.classList.contains("dark-mode")) {
+                document.body.classList.remove("dark-mode");
+                document.body.classList.add("light-mode");
+                theme = "light";
+            } else if (document.body.classList.contains("light-mode")) {
+                document.body.classList.remove("light-mode");
+                document.body.classList.add("dark-mode");
+                theme = "dark";
+            } else {
+                if (prefersDarkScheme.matches) {
+                    document.body.classList.add("light-mode");
+                    theme = "light";
+                } else {
+                    document.body.classList.add("dark-mode");
+                    theme = "dark";
+                }
+            }
+            localStorage.setItem("theme", theme);
+        });
+    </script>
+</body>
+</html>
