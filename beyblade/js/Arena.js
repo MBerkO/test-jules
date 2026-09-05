@@ -1,4 +1,4 @@
-import * as THREE from '../js/three.min.js';
+const THREE = window.THREE;
 
 export class Arena {
     constructor() {

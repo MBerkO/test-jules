@@ -1,4 +1,4 @@
-import * as THREE from '../js/three.min.js';
+const THREE = window.THREE;
 import * as CANNON from '../js/cannon-es.js';
 import { DragoonV2 } from './DragoonV2.js';
 import { Arena } from './Arena.js';
