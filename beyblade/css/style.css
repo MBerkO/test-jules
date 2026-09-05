@@ -1,0 +1,114 @@
+/* Temel Sıfırlama ve Minimalist Tasarım */
+:root {
+    --bg-color: #f5f5f5;
+    --text-color: #333333;
+    --panel-bg: rgba(255, 255, 255, 0.9);
+    --primary-color: #e63946;
+    --primary-hover: #d62828;
+    --btn-text: #ffffff;
+    --secondary-btn: #457b9d;
+    --secondary-hover: #1d3557;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-color: #121212;
+        --text-color: #e0e0e0;
+        --panel-bg: rgba(30, 30, 30, 0.85);
+        --primary-color: #ef233c;
+        --primary-hover: #d90429;
+        --secondary-btn: #457b9d;
+        --secondary-hover: #a8dadc;
+        --btn-text: #ffffff;
+    }
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* Canvas'ın scroll bar oluşturmasını engellemek için */
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#canvas-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1; /* Arayüzün altında kalması için */
+}
+
+#ui-container {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 10;
+    background-color: var(--panel-bg);
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(5px);
+    max-width: 300px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.header h1 {
+    margin: 0 0 5px 0;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.header p {
+    margin: 0 0 20px 0;
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+.controls {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.btn {
+    padding: 12px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background-color: var(--secondary-btn);
+    color: var(--btn-text);
+}
+
+.btn:hover {
+    background-color: var(--secondary-hover);
+    transform: translateY(-1px);
+}
+
+.btn:active {
+    transform: translateY(1px);
+}
+
+.btn.primary {
+    background-color: var(--primary-color);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.btn.primary:hover {
+    background-color: var(--primary-hover);
+}
+
+.instructions {
+    font-size: 12px;
+    opacity: 0.7;
+    line-height: 1.4;
+    border-top: 1px solid rgba(128, 128, 128, 0.2);
+    padding-top: 15px;
+}

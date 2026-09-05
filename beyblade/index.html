@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beyblade Simülasyonu: Dragoon V2</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="ui-container">
+        <div class="header">
+            <h1>Dragoon V2</h1>
+            <p>Saldırı Tipi - Sol Dönüş</p>
+        </div>
+
+        <div class="controls">
+            <button id="btn-letitrip" class="btn primary">Fırlat (Let it Rip!)</button>
+            <button id="btn-reset" class="btn">Sıfırla</button>
+        </div>
+
+        <div class="instructions">
+            <p>Görünümü değiştirmek için farenizle sürükleyin veya tekerleği kullanın.</p>
+        </div>
+    </div>
+
+    <!-- 3D Canvas will be injected here -->
+    <div id="canvas-container"></div>
+
+    <script src="js/three.min.js"></script>
+    <script src="js/OrbitControls.js"></script>
+    <script type="module">
+        import * as CANNON from './js/cannon-es.js';
+        window.CANNON = CANNON;
+    </script>
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
